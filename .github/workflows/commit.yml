@@ -1,17 +1,29 @@
-name: Commit Workflow
+name: Ежедневный коммит
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 6 * * *'  # каждый день в 6 утра по UTC
+  workflow_dispatch:
 
 jobs:
-  example_job:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout репозитория
         uses: actions/checkout@v3
 
-      - name: Print commit message
-        run: echo "New commit pushed to main branch!"
+      - name: Изменить файл
+        run: |
+          echo "Последний запуск: $(date)" > last-run.txt
+
+      - name: Настроить Git
+        run: |
+          git config --global user.name "Владимир"
+          git config --global user.email "ТВОЙ_EMAIL@пример.com"
+
+      - name: Сделать коммит
+        run: |
+          git add last-run.txt
+          git commit -m "Авто-коммит: $(date)" || echo "Нечего коммитить"
+          git push
